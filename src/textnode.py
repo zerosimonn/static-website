@@ -1,4 +1,5 @@
 from enum import Enum
+from htmlnode import LeafNode
 
 class TextType(Enum):
     TEXT = "text"
@@ -37,3 +38,12 @@ def text_node_to_html_node(text_node):
     if text_node.text_type == TextType.IMAGE:
         return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
     raise ValueError(f"invalid text type: {text_node.text_type}")
+
+def extract_title(markdown):
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line[2:].strip()
+        else:
+            raise Exception("No h1 header found in markdown")
+        

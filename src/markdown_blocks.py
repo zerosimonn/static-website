@@ -1,7 +1,7 @@
 from enum import Enum
 import re
 from inline_markdown import text_to_textnode
-from htmlnode import HTMLNode, ParentNode
+from htmlnode import HTMLNode, ParentNode, LeafNode
 from textnode import text_node_to_html_node, TextNode, TextType
 
 class BlockType(Enum):
@@ -98,7 +98,7 @@ def block_to_html_node(block):
 
 
 def text_to_children(text):
-    text_nodes = text_to_textnodes(text)
+    text_nodes = text_to_textnode(text)
     children = []
     for text_node in text_nodes:
         html_node = text_node_to_html_node(text_node)
