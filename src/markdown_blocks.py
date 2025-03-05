@@ -1,16 +1,18 @@
 from enum import Enum
-import re
-from inline_markdown import text_to_textnode
-from htmlnode import HTMLNode, ParentNode, LeafNode
+
+from htmlnode import ParentNode
+from inline_markdown import text_to_textnodes
 from textnode import text_node_to_html_node, TextNode, TextType
+
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
     HEADING = "heading"
     CODE = "code"
-    QUOTE = "quote"
-    OLIST = "unordered_list"
-    ULIST = "ordered_list"
+    QUOTE = "quite"
+    OLIST = "ordered_list"
+    ULIST = "unordered_list"
+
 
 def markdown_to_blocks(markdown):
     blocks = markdown.split("\n\n")
@@ -25,10 +27,10 @@ def markdown_to_blocks(markdown):
 
 def block_to_block_type(block):
     lines = block.split("\n")
-    pattern = r"\A#{1,6} "
-    if re.match(pattern, block):
+
+    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockType.HEADING
-    elif block.startswith("```") and block.endswith("```"):
+    if len(lines) > 1 and lines[0].startswith("```") and lines[-1].startswith("```"):
         return BlockType.CODE
     if block.startswith(">"):
         for line in lines:
@@ -48,27 +50,6 @@ def block_to_block_type(block):
             i += 1
         return BlockType.OLIST
     return BlockType.PARAGRAPH
-    
-
-def markdown_to_blocks(markdown):
-    # markdown is full text str
-    # returns list of block str
-    blocks = []
-    lines = markdown.splitlines()
-    current_block = []
-
-    for line in lines:
-        if line.strip() == "":
-            if current_block:
-                blocks.append("\n".join(current_block))
-                current_block = []
-            continue
-        current_block.append(line)
-    if current_block:
-        blocks.append("\n".join(current_block))
-        current_block = []   #not needed
-
-    return blocks
 
 
 def markdown_to_html_node(markdown):
@@ -98,7 +79,7 @@ def block_to_html_node(block):
 
 
 def text_to_children(text):
-    text_nodes = text_to_textnode(text)
+    text_nodes = text_to_textnodes(text)
     children = []
     for text_node in text_nodes:
         html_node = text_node_to_html_node(text_node)
@@ -155,7 +136,6 @@ def ulist_to_html_node(block):
         children = text_to_children(text)
         html_items.append(ParentNode("li", children))
     return ParentNode("ul", html_items)
-
 
 def quote_to_html_node(block):
     lines = block.split("\n")
